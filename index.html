@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Socket</title>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>     
+    <link rel="stylesheet" href="client/css/index.css">
+</head>
+
+<body style="background:#f2f2f2">
+    <div class="chat">
+        
+        <div class="chat-box">
+            <div class="chat-login">
+                <div class="login-top"></div>
+                <img src="img/chat_icon.png" alt="">
+                <h1>ChatRoom</h1>
+                <h2>Sign In</h2>
+                <div class="login-userinfo login-username">
+                    <i class="iconfont userNameIcon">&#xe600;</i>
+                    <input class="usernameinput" type="text" / >
+                </div>
+                <span class="login-btn">Login</span>
+            </div>
+            <div class="chat-room">
+                <div class="chat-list"></div>
+                <div class="chat-form">
+                    <input class="say" type="text" />
+                    <span class="send">发送</span>
+                </div>
+                <div class="userinfo">
+                    <div class="userinfo-avator">
+                        <img src="img/miku.jpg" />
+                        <h3>Username</h3>
+                        <h4>Address</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(function(){
+
+		        var socket = io.connect('http://wisper.pub/ChatRoom/');
+
+        var $chatRoom = $(".chat-room");
+        var $userNameInput = $(".usernameinput");
+        var $chatList = $('.chat-list');
+        var $chatInput = $(".say");
+        var $userInfo = $('.userinfo');
+        var avatorArr = [];
+        var userid = '';
+        var username = '';
+        var useravator = '';
+        var userlist = [];
+        var address = "您可能来自外太空!";
+
+
+    //客户端事件
+        //获取头像数组
+        $.getJSON("avator.json",function(data){
+            console.log(data)
+            avatorArr = data.avator;
+
+        }) 
+        //发送信息
+        $(".send").click(function(){
+            sendMsg();
+        })
+        $chatInput.keydown(function(e) {
+            if(e.keyCode == 13){
+                sendMsg();
+            }
+        });
+        //填写用户信息
+        $userNameInput.val("");
+        $userNameInput.focus(function() {
+            $(".userNameIcon").css({
+                "color":"#96ace6",
+                "font-size":"18px"
+            })
+            $(".login-username").css("border-color","#96ace6")
+        }).blur(function(){
+            $(".userNameIcon").css({
+                "color":"#999",
+                "font-size":"16px"
+            })
+            $(".login-username").css("border-color","#999")
+        })
+        //login1
+        $(".login-btn").click(function(){
+            setUsername();
+            login(username);
+        })
+        $(".usernameinput").keydown(function(e) {
+            setUsername();
+            if(e.keyCode == 13){
+                login(username)
+            }
+        });
+
+        //玩家发言
+        function sendMsg(){
+            var message = $chatInput.val();
+            if(message){
+                socket.emit('chat message', {
+                    username: username,
+                    message: message,
+                    useravator: useravator
+                });
+                $chatInput.val('');
+                addMsgList({
+                    username: username,
+                    useravator: useravator,
+                    message: message,
+                    owner: true
+                })
+            }else{
+                alert("请输入内容");
+                $chatInput.focus();
+            }
+        }
+
+        //添加chatList
+        function addMsgList(data){
+            if(data.owner){
+                var $msgDiv = $("<div class='ownerList'></div>")
+            }else{
+                var $msgDiv = $("<div class='otherList'></div>")
+            }
+            var $useravator = $("<img src='"+data.useravator+"'/>");
+            var $username = $("<span class='login-username'>"+data.username+"</span>");
+            var $msg = $("<em class='chat-msg'>"+data.message+"</em>");
+            $msgDiv.append($useravator, $username, $msg);
+            $chatList.append($msgDiv);
+            $chatList.scrollTop($chatList[0].scrollHeight)
+        }
+
+        //设置名字
+        function setUsername(){
+            username = $userNameInput.val();
+        }
+
+        function initUserInfo(){
+            $userInfo.find("img").attr("src",useravator);
+            $userInfo.find("h3").text(username);
+            $userInfo.find("h4").text(address);
+        }
+
+        //登录
+        function login(username){
+            if(username){
+                $(".chat-login").fadeOut();
+                $(".chat-room").fadeIn();
+                $chatInput.focus();
+                getUid();
+                getAvator();
+                socket.emit('add user', {
+                    username: username,
+                    userid: userid
+                });
+                $.getScript('http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js', function(_result) {
+                    if (remote_ip_info.ret == '1') {
+                        console.log(remote_ip_info)
+                        address = remote_ip_info.country + '-' + remote_ip_info.province + '省-' + remote_ip_info.city + '市'
+                        console.log(address);
+                    } else {
+                        address = "您可能来自外太空!"
+                        console.log('没有找到匹配的IP地址信息！');
+                    }
+                    initUserInfo();
+                });
+            }else{
+                alert("请输入名字")
+            }
+        }
+        //提示标语
+        function tip(msg){
+            $chatList.append("<p class='tip'>" + msg +"</p>")
+        }
+        //获取用户唯一Id
+        function getUid(){
+            userid = new Date().getTime()+""+Math.floor(Math.random()*899+100);
+        }
+        //获取随机头像
+        function getAvator(){
+            var index = Math.floor(Math.random()*avatorArr.length);
+            useravator = avatorArr[index];
+        }
+
+    //服务器端事件
+    
+        //聊天信息传递
+        socket.on('chat message', function (data){
+            addMsgList(data);
+        });
+
+        //玩家加入广播欢迎提示(他人)
+        socket.on('user joined', function (data) {
+            tip('欢迎人类玩家' + data.username + '加入');
+            console.log(data);
+        });
+
+        //登录提示(自己)
+        socket.on('login', function (data) {
+            console.log(data.onlineUser);
+            for(key in data.onlineUser){
+                if(data.onlineUser.hasOwnProperty(key)){
+                    userlist.push(data.onlineUser[key])
+                }
+            }
+            console.log(userlist)
+            tip("Welcome to chatroom")
+            tip("房间有"+ data.onlineCount +"人在线，在线列表：" + userlist.join(","));
+            
+        });
+
+        //玩家离开
+        socket.on('user leave', function (data) {
+            tip(data.username + '离开');
+            console.log(data);
+        });
+    })
+    
+</script>
+</html>
