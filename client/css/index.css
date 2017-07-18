@@ -1,8 +1,8 @@
 /* 
 * @Author: Marte
 * @Date:   2017-07-10 09:47:34
-* @Last Modified by:   Marte
-* @Last Modified time: 2017-07-10 14:24:34
+* @Last Modified by:   WispXy
+* @Last Modified time: 2017-07-18 10:43:45
 */
 @charset "utf-8";
 /*=========================Reset_start==========================*/
@@ -297,7 +297,7 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius:50%;
     overflow:hidden;
 }
-.otherList .chat-username{
+.otherList .login-username{
     position:absolute;
     left:50px;
     top:0px;
