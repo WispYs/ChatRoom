@@ -2,7 +2,7 @@
 * @Author: Marte
 * @Date:   2017-07-10 09:47:34
 * @Last Modified by:   WispXy
-* @Last Modified time: 2017-07-18 10:43:45
+* @Last Modified time: 2017-07-18 10:51:01
 */
 @charset "utf-8";
 /*=========================Reset_start==========================*/
@@ -261,7 +261,7 @@ input[type=number]::-webkit-outer-spin-button {
     margin-right: 18px;
     line-height: 23px;
     color: white;
-    background: #3398dc;
+    background: #7f9be4;
     padding: 10px;
     font-size: 14px;
     border-radius: 10px;
@@ -281,7 +281,7 @@ input[type=number]::-webkit-outer-spin-button {
     width: 0;
     height: 0;
     border-top: 0px solid transparent;
-    border-left: 8px solid #3398dc;
+    border-left: 8px solid #7f9be4;
     border-bottom: 16px solid transparent;
 }
 
@@ -308,8 +308,8 @@ input[type=number]::-webkit-outer-spin-button {
     float:left;
     margin-left: 18px;
     line-height: 23px;
-    color: white;
-    background: #3398dc;
+    color: #393939;
+    background: #f2f2f2;
     padding: 10px;
     font-size: 14px;
     border-radius: 10px;
@@ -329,6 +329,6 @@ input[type=number]::-webkit-outer-spin-button {
     width: 0;
     height: 0;
     border-top: 0px solid transparent;
-    border-right: 8px solid #3398dc;
+    border-right: 8px solid #f2f2f2;
     border-bottom: 16px solid transparent;
 }
