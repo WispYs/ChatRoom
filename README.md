@@ -3,7 +3,7 @@
 
 ## 搭建本地环境
 
-``` 
+``` bash
 # 安装
 npm install
 
